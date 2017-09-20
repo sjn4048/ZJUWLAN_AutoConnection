@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
+using System.Diagnostics;
 
 namespace ZJUWLAN_Connection
 {
@@ -21,18 +23,18 @@ namespace ZJUWLAN_Connection
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            CheckWifiStateInWinForm(wifiRequest);
             try
             {
                 Config.ReadConfig();
-                CheckWifiStateInWinForm(wifiRequest);
-                if (Config.autoConnection)
-                {
-                    ConnectButton.PerformClick();
-                }
             }
             catch
             {
                 MessageBox.Show(text:"进入程序后请先进行设置", caption:"尚未设置",icon:MessageBoxIcon.Information, buttons:MessageBoxButtons.OK);
+            }
+            if (Config.isAutoConnection)
+            {
+                ConnectWifi();
             }
         }
 
@@ -43,24 +45,12 @@ namespace ZJUWLAN_Connection
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-            if (!wifiRequest.OverallConnection())
-            {
-                MessageBox.Show(text: "连接失败，请重试。如仍无法连接，请检查①WLAN是否连接，②用户名/密码是否正确，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
-            }
-            else
-            {
-                CheckWifiStateInWinForm(wifiRequest);
-                if (Config.autoHide)
-                {
-                    this.Close();
-                }
-            }
+            ConnectWifi();
         }
 
         private void CheckWifiStateInWinForm(WIFIRequest wifiRequest)
         {
-            int pingTime = -1, signalQuality = 0;
-            wifiRequest.CheckWifiState(out signalQuality ,out pingTime);
+            wifiRequest.CheckWifiState(out int signalQuality ,out int pingTime);
 
             switch (wifiRequest.WlanStatus)
             {
@@ -114,6 +104,29 @@ namespace ZJUWLAN_Connection
         {
             new SettingForm() { TopMost = true }
             .Show();
+        }
+
+        private void ConnectWifi()
+        {
+            var result = wifiRequest.OverallConnection();
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            while(stopwatch.ElapsedMilliseconds < 2000)
+            {
+                CheckWifiStateInWinForm(wifiRequest);
+                if (wifiRequest.IsNetAvailable)
+                {
+                    stopwatch.Stop();
+                    if (Config.isAutoHide)
+                    {
+                        this.Close();
+                    }
+                    return;
+                }
+            }
+            MessageBox.Show(text: "连接失败，请重试。如仍无法连接，请检查①WLAN是否连接，②用户名/密码是否正确，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
         }
     }
 }

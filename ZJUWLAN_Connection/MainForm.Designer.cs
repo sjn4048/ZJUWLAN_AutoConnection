@@ -61,9 +61,9 @@
             // ConnectButton
             // 
             this.ConnectButton.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.ConnectButton.Location = new System.Drawing.Point(150, 145);
+            this.ConnectButton.Location = new System.Drawing.Point(146, 145);
             this.ConnectButton.Name = "ConnectButton";
-            this.ConnectButton.Size = new System.Drawing.Size(100, 40);
+            this.ConnectButton.Size = new System.Drawing.Size(105, 40);
             this.ConnectButton.TabIndex = 2;
             this.ConnectButton.Text = "一键连接";
             this.ConnectButton.UseVisualStyleBackColor = true;
@@ -74,7 +74,7 @@
             this.CheckButton.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.CheckButton.Location = new System.Drawing.Point(34, 145);
             this.CheckButton.Name = "CheckButton";
-            this.CheckButton.Size = new System.Drawing.Size(110, 40);
+            this.CheckButton.Size = new System.Drawing.Size(105, 40);
             this.CheckButton.TabIndex = 2;
             this.CheckButton.Text = "检查网络";
             this.CheckButton.UseVisualStyleBackColor = true;
@@ -93,7 +93,7 @@
             // SettingButton
             // 
             this.SettingButton.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.SettingButton.Location = new System.Drawing.Point(256, 145);
+            this.SettingButton.Location = new System.Drawing.Point(258, 145);
             this.SettingButton.Name = "SettingButton";
             this.SettingButton.Size = new System.Drawing.Size(80, 40);
             this.SettingButton.TabIndex = 2;
@@ -105,7 +105,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(358, 210);
+            this.ClientSize = new System.Drawing.Size(369, 210);
             this.Controls.Add(this.SettingButton);
             this.Controls.Add(this.CheckButton);
             this.Controls.Add(this.ConnectButton);
@@ -113,6 +113,7 @@
             this.Controls.Add(this.findLabel);
             this.Controls.Add(this.connectLabel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "一键联网";
             this.Load += new System.EventHandler(this.MainForm_Load);

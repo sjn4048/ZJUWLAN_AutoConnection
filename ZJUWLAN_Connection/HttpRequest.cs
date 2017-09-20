@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using NativeWifi;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace ZJUWLAN_Connection
 {
     class WIFIRequest
     {
-        public bool IsZJUWlanDetected = false;//是否能检测到ZJUWLAN
-        public bool IsNetAvailable = false;//是否能连接到网络
+        public bool IsZJUWlanDetected;//是否能检测到ZJUWLAN
+        public bool IsNetAvailable;//是否能连接到网络
         public enum WlanStatusEnum
         {
             ZJUWlan,
@@ -21,48 +22,22 @@ namespace ZJUWLAN_Connection
         };//是否连接上了ZJUWLAN
         public WlanStatusEnum WlanStatus = WlanStatusEnum.Unconnected;
 
-        public string GetCurrentConnection()//负责获取当前连接的WIFI的名字，别的不关心
+        public enum ConnectionResult
         {
-            try
-            {
-                WlanClient client = new WlanClient();
-                foreach (WlanClient.WlanInterface wlanIface in client.Interfaces)
-                {
-                    Wlan.WlanAvailableNetwork[] networks = wlanIface.GetAvailableNetworkList(0);
-                    var query = networks.Where(a => a.profileName == "ZJUWLAN");
-                    if (query != null)
-                    {
-                        IsZJUWlanDetected = true;
-                    }
-                    else
-                    {
-                        IsZJUWlanDetected = false;
-                    }
-                    foreach (Wlan.WlanAvailableNetwork network in networks)
-                    {
-                        if (wlanIface.InterfaceState == Wlan.WlanInterfaceState.Connected && wlanIface.CurrentConnection.isState == Wlan.WlanInterfaceState.Connected)
-                        {
-                            return wlanIface.CurrentConnection.profileName;
-                        }
-                    }
-                }
-                return string.Empty;
-            }
-            catch
-            {
-                return string.Empty;
-            }
-        }
+            Success,
+            AlreadyConnected,
+            AlteredToZJUWLAN,
+            Unfound,
+            FailToConnect,
+            FailToWork,
+        };
 
         public void CheckWifiState(out int signalQuality, out int pingTime)//负责检测当前WIFI是否能Ping百度，返回pingTime
         {
-            string currentWifiName;
-           
-            ScanSSID();
             signalQuality = WIFISSID.zjuWlanSsid.wlanSignalQuality;
             pingTime = -1;
 
-            currentWifiName = GetCurrentConnection();
+            string currentWifiName = GetCurrentConnection();
             if (currentWifiName == string.Empty)
             {
                 WlanStatus = WlanStatusEnum.Unconnected;
@@ -84,14 +59,14 @@ namespace ZJUWLAN_Connection
             {
                 try
                 {
-                    PingReply reply = pingSender.Send("www.baidu.com", 1000, buf, options);
+                    PingReply reply = pingSender.Send("www.baidu.com", 2000, buf, options);
                     pingTime = (int)reply.RoundtripTime;
                     if (reply.Status == IPStatus.Success)
                     {
                         IsNetAvailable = true;
                         break;
                     }
-                    if (i == 5)
+                    if (i == 2)
                     {
                         IsNetAvailable = false;
                     }
@@ -103,17 +78,34 @@ namespace ZJUWLAN_Connection
             }
         }
 
-        public bool OverallConnection()//联网行为的总入口
+        public ConnectionResult OverallConnection()//联网行为的总入口
         {
-            if (IsNetAvailable && !Config.zjuFirst)
-                return true;
-            ScanSSID();
+            ConnectionResult connectionResult = ConnectionResult.Success;
+
+            if (IsNetAvailable && !Config.isZJUWLANFirst)
+            {
+                return ConnectionResult.AlreadyConnected;
+            }
+            else if (IsNetAvailable && Config.isZJUWLANFirst)
+            {
+                connectionResult = ConnectionResult.AlteredToZJUWLAN;
+            }
+
             if (!IsZJUWlanDetected)
-                return false;
+            {
+                return ConnectionResult.Unfound;
+            }
+
             if (WlanStatus != WlanStatusEnum.ZJUWlan)
+            {
                 ConnectWifi();
+            }
+
+            CheckWifiState(out int signalQuality, out int pingTime);
             if (IsNetAvailable)
-                return true;
+            {
+                return ConnectionResult.Success;
+            }
 
             int i = 0;
             while (true)
@@ -125,12 +117,12 @@ namespace ZJUWLAN_Connection
                 }
                 catch
                 {
-                    i++;
-                    if (i >= 5)
-                        return false;
+                    if (i++ >= 30)
+                        return ConnectionResult.FailToWork;
                 }
             }
-            return true;
+            Thread.Sleep(200);
+            return connectionResult;
         }
 
         private void ConnectWifi()//只负责连接WIFI，不负责验证
@@ -157,21 +149,31 @@ namespace ZJUWLAN_Connection
             myStreamWriter.Close();
         }
 
-        public void ScanSSID()
+        public string GetCurrentConnection()//负责获取当前连接的WIFI的名字，别的不关心
         {
             WlanClient client = new WlanClient();
             foreach (WlanClient.WlanInterface wlanIface in client.Interfaces)
             {
                 Wlan.WlanAvailableNetwork[] networks = wlanIface.GetAvailableNetworkList(0);
-                var ZJUWlanNetwork = networks.Where(n => n.profileName == "ZJUWLAN").First();
-                WIFISSID.zjuWlanSsid.wlanInterface = wlanIface;
-                WIFISSID.zjuWlanSsid.wlanSignalQuality = (int)ZJUWlanNetwork.wlanSignalQuality;
-                WIFISSID.zjuWlanSsid.SSID = GetStringForSSID(ZJUWlanNetwork.dot11Ssid);
-                WIFISSID.zjuWlanSsid.dot11DefaultAuthAlgorithm = ZJUWlanNetwork.dot11DefaultAuthAlgorithm.ToString();
-            }
-        }//扫描所有的网络获取ZJUWLAN
+                if (networks.Any(n => n.profileName == "ZJUWLAN"))
+                {
+                    IsZJUWlanDetected = true;
+                    var ZJUWlanNetwork = networks.Where(n => n.profileName == "ZJUWLAN").First();
+                    WIFISSID.zjuWlanSsid.wlanInterface = wlanIface;
+                    WIFISSID.zjuWlanSsid.wlanSignalQuality = (int)ZJUWlanNetwork.wlanSignalQuality;
+                    WIFISSID.zjuWlanSsid.SSID = GetStringForSSID(ZJUWlanNetwork.dot11Ssid);
+                    WIFISSID.zjuWlanSsid.dot11DefaultAuthAlgorithm = ZJUWlanNetwork.dot11DefaultAuthAlgorithm.ToString();
+                }
 
-        public string StringToHex(string str)
+                if (wlanIface.InterfaceState == Wlan.WlanInterfaceState.Connected && wlanIface.CurrentConnection.isState == Wlan.WlanInterfaceState.Connected)
+                {
+                    return wlanIface.CurrentConnection.profileName;
+                }
+            }
+            return string.Empty;
+        }
+
+        public string StringToHex(string str)//字符串转换工具。不用管它。
         {
             StringBuilder sb = new StringBuilder();
             byte[] byStr = System.Text.Encoding.Default.GetBytes(str); //默认是System.Text.Encoding.Default.GetBytes(str)    
@@ -180,12 +182,12 @@ namespace ZJUWLAN_Connection
                 sb.Append(Convert.ToString(byStr[i], 16));
             }
             return (sb.ToString().ToUpper());
-        }//字符串转换工具。不用管它。
+        }
 
-        public string GetStringForSSID(Wlan.Dot11Ssid ssid)
+        public string GetStringForSSID(Wlan.Dot11Ssid ssid)//字符串转换工具，不用管它。
         {
             return Encoding.UTF8.GetString(ssid.SSID, 0, (int)ssid.SSIDLength);
-        }//字符串转换工具，不用管它。
+        }
     }
 
     class WIFISSID

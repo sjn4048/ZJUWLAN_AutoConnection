@@ -32,10 +32,6 @@ namespace ZJUWLAN_Connection
             {
                 MessageBox.Show(text:"进入程序后请先进行设置", caption:"尚未设置",icon:MessageBoxIcon.Information, buttons:MessageBoxButtons.OK);
             }
-            if (Config.isAutoConnection)
-            {
-                ConnectWifi();
-            }
         }
 
         private void CheckButton_Click(object sender, EventArgs e)
@@ -73,7 +69,7 @@ namespace ZJUWLAN_Connection
             switch (wifiRequest.IsNetAvailable)
             {
                 case (true):
-                    this.checkLabel.Text = $"已联网, ping:{pingTime}ms, 信号:{WIFISSID.zjuWlanSsid.wlanSignalQuality}";
+                    this.checkLabel.Text = $"已联网, ping:{pingTime}ms, 信号:{WIFISSID.WlanSsid.wlanSignalQuality}";
                     this.checkLabel.ForeColor = Color.DarkGreen;
                     break;
                 case (false):
@@ -110,23 +106,28 @@ namespace ZJUWLAN_Connection
         {
             var result = wifiRequest.OverallConnection();
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            while(stopwatch.ElapsedMilliseconds < 2000)
+            for (int i = 0; i < 3; i++)
             {
                 CheckWifiStateInWinForm(wifiRequest);
                 if (wifiRequest.IsNetAvailable)
                 {
-                    stopwatch.Stop();
                     if (Config.isAutoHide)
-                    {
                         this.Close();
-                    }
                     return;
                 }
             }
-            MessageBox.Show(text: "连接失败，请重试。如仍无法连接，请检查①WLAN是否连接，②用户名/密码是否正确，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+            if (MessageBox.Show(text: $"连接失败，错误码：{result}，请尝试点击“重试”。如仍无法连接，请检查①用户名/密码是否正确，②是否ZJUWLAN信号过弱，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.RetryCancel) == DialogResult.Retry)
+            {
+                ConnectWifi();
+            }
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            if (Config.isAutoConnection)
+            {
+                ConnectWifi();
+            }
         }
     }
 }

@@ -20,13 +20,16 @@ namespace ZJUWLAN_Connection
         public static string username;//用户名
         public static string password;//密码
 
+        public static string configPath = $"{AppDomain.CurrentDomain.BaseDirectory}config.ini";
+
+
         public static void ReadConfig()
         {
-            if (!File.Exists("Config.ini"))
+            if (!File.Exists(configPath))
             {
-                throw new Exception();
+                throw new Exception("无法读取文件");
             }
-            using (StreamReader configSr = new StreamReader(new FileStream("Config.ini", FileMode.Open)))
+            using (StreamReader configSr = new StreamReader(new FileStream(configPath, FileMode.Open)))
             {
                 var configPart = configSr.ReadToEnd().Split(',');
                 isAutoConnection = bool.Parse(configPart[0]);
@@ -38,7 +41,7 @@ namespace ZJUWLAN_Connection
             }
             if (isAutoBoot && !SetAutoBootStatus(isAutoBoot))
             {
-                MessageBox.Show(text: "开机自启动需要管理员权限。请尝试退出程序，并右键使用“管理员权限”重新打开本程序。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
+                MessageBox.Show(text: "开机自启动需要管理员权限。请退出程序，并右键以管理员身份重新打开程序进行设置。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
                 isAutoBoot = false;
             }
         }
@@ -46,10 +49,10 @@ namespace ZJUWLAN_Connection
         {
             if (!IsAdministrator() && (autoBoot != isAutoBoot))
             {
-                MessageBox.Show(text: "开机自启动需要管理员权限。请尝试退出程序，并右键使用“管理员权限”重新打开本程序。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
+                MessageBox.Show(text: "开机自启动需要管理员权限。请退出程序，并右键以管理员身份重新打开程序进行设置。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
                 autoBoot = isAutoBoot;
             }
-            using (var configSr = new StreamWriter(new FileStream("Config.ini", FileMode.Create, FileAccess.ReadWrite)))
+            using (var configSr = new StreamWriter(new FileStream(configPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite)))
             {
                 string configString = $"{autoConnection},{autoHide},{zjuFirst},{autoBoot},{username},{password}";
                 configSr.Write(configString);
@@ -61,12 +64,12 @@ namespace ZJUWLAN_Connection
         {
             try
             {
-                string exePath = $@"""{Application.ExecutablePath}"" -autorun";//程序exe文件位置
+                string exePath = $"\"{Application.ExecutablePath.Replace('/', '\\')}\"";//程序exe文件位置
                 var a = Application.ExecutablePath;
                 string registryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";//自启动注册表目录
 
                 string value = "ZJUWLANAutoConnector";//写入注册表的值
-                RegistryKey registryKey = Registry.LocalMachine;//总的注册表变量
+                RegistryKey registryKey = Registry.CurrentUser;//总的注册表变量
                 RegistryKey registryKey_Read = registryKey.OpenSubKey(registryKeyPath);//读取注册表
 
                 if (isAutoBoot)

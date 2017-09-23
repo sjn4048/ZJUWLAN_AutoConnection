@@ -117,6 +117,7 @@
             this.Name = "MainForm";
             this.Text = "一键联网";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

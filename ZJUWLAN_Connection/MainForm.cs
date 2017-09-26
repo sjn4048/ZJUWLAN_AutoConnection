@@ -18,35 +18,53 @@ namespace ZJUWLAN_Connection
 
         public MainForm()
         {
+            System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            CheckWifiStateInWinForm(wifiRequest);
-            try
+            connectLabel.Text = checkLabel.Text = "";
+            findLabel.Text = "检查WIFI中...";
+            Task.Run(() =>
             {
-                Config.ReadConfig();
-            }
-            catch
-            {
-                MessageBox.Show(text:"进入程序后请先进行设置", caption:"尚未设置",icon:MessageBoxIcon.Information, buttons:MessageBoxButtons.OK);
-            }
+                findLabel.ForeColor = Color.Lime;
+                wifiRequest.CheckWifiState(out int signalQuality, out int pingTime);
+                try
+                {
+                    Config.ReadConfig();
+                }
+                catch
+                {
+                    MessageBox.Show(text: "进入程序后请先进行设置", caption: "尚未设置", icon: MessageBoxIcon.Information, buttons: MessageBoxButtons.OK);
+                }
+                if (Config.isAutoConnection)
+                {
+                    Task.Run(() =>
+                    {
+                        ConnectWifi();
+                    }).Wait();
+                }
+                DisplayResult(wifiRequest);
+            });
         }
 
         private void CheckButton_Click(object sender, EventArgs e)
         {
-            CheckWifiStateInWinForm(wifiRequest);
+            DisplayResult(wifiRequest);
         }
 
         private void ConnectButton_Click(object sender, EventArgs e)
         {
-            ConnectWifi();
+            Task.Run(() =>
+            {
+                ConnectWifi();
+            });
         }
 
-        private void CheckWifiStateInWinForm(WIFIRequest wifiRequest)
+        private void DisplayResult(WIFIRequest wifiRequest)
         {
-            wifiRequest.CheckWifiState(out int signalQuality ,out int pingTime);
+            wifiRequest.CheckWifiState(out int signalQuality, out int pingTime);
 
             switch (wifiRequest.WlanStatus)
             {
@@ -104,11 +122,16 @@ namespace ZJUWLAN_Connection
 
         private void ConnectWifi()
         {
+            findLabel.Text = "已发现ZJUWLAN";
+            findLabel.ForeColor = Color.DarkGreen;
+            connectLabel.Text = "连接中...";
+            connectLabel.ForeColor = Color.MediumBlue;
+
             var result = wifiRequest.OverallConnection();
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++, Thread.Sleep(200))
             {
-                CheckWifiStateInWinForm(wifiRequest);
+                wifiRequest.CheckWifiState(out int signalQuality, out int pingTime);
                 if (wifiRequest.IsNetAvailable)
                 {
                     if (Config.isAutoHide)
@@ -120,14 +143,12 @@ namespace ZJUWLAN_Connection
             {
                 ConnectWifi();
             }
+            DisplayResult(wifiRequest);
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            if (Config.isAutoConnection)
-            {
-                ConnectWifi();
-            }
+
         }
     }
 }

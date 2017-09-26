@@ -32,12 +32,12 @@ namespace ZJUWLAN_Connection
             FailToWork,
         };
 
-        public void CheckWifiState(out int signalQuality, out int pingTime)//负责检测当前WIFI是否能Ping百度，返回pingTime
+        public void CheckWifiState(out int signalQuality, out int pingTime, string wifiSSID = "ZJUWLAN")//负责检测当前WIFI是否能Ping百度，返回pingTime
         {
             signalQuality = WIFISSID.WlanSsid.wlanSignalQuality;
             pingTime = -1;
 
-            string currentWifiName = GetCurrentConnection("ZJUWLAN");
+            string currentWifiName = GetCurrentConnection(wifiSSID);
             if (currentWifiName == string.Empty)
             {
                 WlanStatus = WlanStatusEnum.Unconnected;
@@ -55,11 +55,11 @@ namespace ZJUWLAN_Connection
             PingOptions options = new PingOptions { DontFragment = true };
             string data = "ping test data";
             byte[] buf = Encoding.ASCII.GetBytes(data);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
                 try
                 {
-                    PingReply reply = pingSender.Send("www.baidu.com", 2000, buf, options);
+                    PingReply reply = pingSender.Send("www.baidu.com", 1000, buf, options);
                     pingTime = (int)reply.RoundtripTime;
                     if (reply.Status == IPStatus.Success)
                     {
@@ -74,11 +74,12 @@ namespace ZJUWLAN_Connection
                 catch
                 {
                     IsNetAvailable = false;
+                    break;
                 }
             }
         }
 
-        public ConnectionResult OverallConnection()//联网行为的总入口
+        public ConnectionResult OverallConnection(string wifiSSID = "ZJUWLAN")//联网行为的总入口，默认连ZJUWLAN
         {
             ConnectionResult connectionResult = ConnectionResult.Success;
 
@@ -98,7 +99,8 @@ namespace ZJUWLAN_Connection
 
             if (WlanStatus != WlanStatusEnum.ZJUWlan)
             {
-                ConnectWifi();
+                if (wifiSSID == "ZJUWLAN")
+                    ConnectWifi(wifiSSID);
             }
 
             CheckWifiState(out int signalQuality, out int pingTime);
@@ -124,13 +126,28 @@ namespace ZJUWLAN_Connection
             return connectionResult;
         }
 
-        private void ConnectWifi()//只负责连接WIFI，不负责验证
+        private void ConnectWifi(string wifiSSID)//只负责连接WIFI，不负责验证
         {
             string profileName = WIFISSID.WlanSsid.SSID;
             string mac = StringToHex(profileName);
             string myProfileXML = string.Format("<?xml version=\"1.0\"?><WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"><name>{0}</name><SSIDConfig><SSID><hex>{1}</hex><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>open</authentication><encryption>none</encryption><useOneX>false</useOneX></authEncryption></security></MSM></WLANProfile>", profileName, mac);
             WIFISSID.WlanSsid.wlanInterface.SetProfile(Wlan.WlanProfileFlags.AllUser, myProfileXML, true);
             WIFISSID.WlanSsid.wlanInterface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
+        }
+
+        private void PostZJUTV(string username, string password)//连接All Hail ZJUTV
+        {
+            var data = "ToBeFilled";//
+            string url = "net.zjubtv.com/login";//这个也确认一下
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = Encoding.UTF8.GetByteCount(data);
+            Stream myRequestStream = request.GetRequestStream();
+            StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
+            myStreamWriter.Write(data);
+            myStreamWriter.Close();
         }
 
         private void PostZJUWLAN(string username, string password)//只负责POST用户名与密码，不负责判断WIFI是否连上

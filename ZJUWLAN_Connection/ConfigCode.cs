@@ -19,6 +19,7 @@ namespace ZJUWLAN_Connection
         public static bool isAutoBoot;//开机自动启动
         public static string username;//用户名
         public static string password;//密码
+        public static string execute_path; //跟随软件自启动的任务地址
 
         public static string configPath = $"{AppDomain.CurrentDomain.BaseDirectory}config.ini";
 

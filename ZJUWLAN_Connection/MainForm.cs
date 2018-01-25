@@ -9,27 +9,42 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace ZJUWLAN_Connection
 {
     public partial class MainForm : Form
     {
         WIFIRequest wifiRequest = new WIFIRequest();
+        string wifiSSID = "ZJUWLAN";
+        int pingTime, signalQuality;
 
         public MainForm()
         {
             System.Windows.Forms.Control.CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
+            SystemEvents.PowerModeChanged += OnPowerChange;
+        }
+
+        private void OnPowerChange(object s, PowerModeChangedEventArgs e)
+        {
+            switch (e.Mode)
+            {
+                case PowerModes.Resume:
+                    ConnectWifi();
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             connectLabel.Text = checkLabel.Text = "";
+            findLabel.ForeColor = Color.DarkGreen;
             findLabel.Text = "检查WIFI中...";
             Task.Run(() =>
             {
-                findLabel.ForeColor = Color.Lime;
-                wifiRequest.CheckWifiState(out int signalQuality, out int pingTime);
                 try
                 {
                     Config.ReadConfig();
@@ -38,6 +53,7 @@ namespace ZJUWLAN_Connection
                 {
                     MessageBox.Show(text: "进入程序后请先进行设置", caption: "尚未设置", icon: MessageBoxIcon.Information, buttons: MessageBoxButtons.OK);
                 }
+                DisplayResult(wifiRequest);
                 if (Config.isAutoConnection)
                 {
                     Task.Run(() =>
@@ -45,7 +61,6 @@ namespace ZJUWLAN_Connection
                         ConnectWifi();
                     }).Wait();
                 }
-                DisplayResult(wifiRequest);
             });
         }
 
@@ -58,13 +73,14 @@ namespace ZJUWLAN_Connection
         {
             Task.Run(() =>
             {
+                wifiSSID = "ZJUWLAN";
                 ConnectWifi();
             });
         }
 
         private void DisplayResult(WIFIRequest wifiRequest)
         {
-            wifiRequest.CheckWifiState(out int signalQuality, out int pingTime);
+            wifiRequest.CheckWifiState(out signalQuality, out pingTime, wifiSSID);
 
             switch (wifiRequest.WlanStatus)
             {
@@ -120,30 +136,63 @@ namespace ZJUWLAN_Connection
             .Show();
         }
 
-        private void ConnectWifi()
+        private void ConnectWifi(string wifiSSID = "ZJUWLAN")
         {
-            findLabel.Text = "已发现ZJUWLAN";
+            findLabel.Text = $"尝试连接{wifiSSID}";
             findLabel.ForeColor = Color.DarkGreen;
             connectLabel.Text = "连接中...";
             connectLabel.ForeColor = Color.MediumBlue;
 
-            var result = wifiRequest.OverallConnection();
+            var result = wifiRequest.OverallConnection(out signalQuality, out pingTime, wifiSSID);
+            if (wifiRequest.IsNetAvailable)
+            {
+                if (Config.isAutoHide)
+                    this.Close();
+                DisplayResult(wifiRequest);
+                Process autoProcess = new Process();
+                autoProcess.StartInfo.CreateNoWindow = true;
+                autoProcess.StartInfo.UseShellExecute = false;
+                autoProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                autoProcess.StartInfo.FileName = @"D:\Code\python\PyCharmProjects\AutoLoginToZJUTV.com\Autologin.bat";
+                autoProcess.Start();//可改成执行任务部分
+                return;
+            }
 
-            for (int i = 0; i < 3; i++, Thread.Sleep(200))
+            if (MessageBox.Show(text: $"连接失败，错误码：{result}，请尝试点击“重试”。如仍无法连接，请检查①用户名/密码是否正确，②是否{wifiSSID}信号过弱，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.RetryCancel) == DialogResult.Retry)
             {
-                wifiRequest.CheckWifiState(out int signalQuality, out int pingTime);
-                if (wifiRequest.IsNetAvailable)
-                {
-                    if (Config.isAutoHide)
-                        this.Close();
-                    return;
-                }
+                ConnectWifi(wifiSSID);
             }
-            if (MessageBox.Show(text: $"连接失败，错误码：{result}，请尝试点击“重试”。如仍无法连接，请检查①用户名/密码是否正确，②是否ZJUWLAN信号过弱，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.RetryCancel) == DialogResult.Retry)
+            else
+                DisplayResult(wifiRequest);
+        }
+
+        private void NotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+                this.WindowState = FormWindowState.Normal;
+        }
+
+        private void 打开主界面ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Show();
+            this.ShowInTaskbar = true;
+            this.NotifyIcon.Visible = false;
+        }
+
+        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void MainForm_SizeChanged(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
             {
-                ConnectWifi();
+                this.Hide();
+                this.NotifyIcon.Visible = true;
+                this.ShowInTaskbar = false;
+                this.NotifyIcon.ShowBalloonTip(2000, "", "我在这里~需要的时候双击打开我噢~", ToolTipIcon.Info);
             }
-            DisplayResult(wifiRequest);
         }
 
         private void MainForm_Shown(object sender, EventArgs e)

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.connectLabel = new System.Windows.Forms.Label();
             this.checkLabel = new System.Windows.Forms.Label();
@@ -35,6 +36,11 @@
             this.CheckButton = new System.Windows.Forms.Button();
             this.findLabel = new System.Windows.Forms.Label();
             this.SettingButton = new System.Windows.Forms.Button();
+            this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.ContextMenu_NotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.打开主界面ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ContextMenu_NotifyIcon.SuspendLayout();
             this.SuspendLayout();
             // 
             // connectLabel
@@ -101,11 +107,44 @@
             this.SettingButton.UseVisualStyleBackColor = true;
             this.SettingButton.Click += new System.EventHandler(this.SettingButton_Click);
             // 
+            // NotifyIcon
+            // 
+            this.NotifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.NotifyIcon.BalloonTipText = "我在这里~双击打开我~";
+            this.NotifyIcon.ContextMenuStrip = this.ContextMenu_NotifyIcon;
+            this.NotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon.Icon")));
+            this.NotifyIcon.Text = "ZJUWLAN自动连接";
+            this.NotifyIcon.Visible = true;
+            this.NotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon_MouseDoubleClick);
+            // 
+            // ContextMenu_NotifyIcon
+            // 
+            this.ContextMenu_NotifyIcon.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.ContextMenu_NotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.打开主界面ToolStripMenuItem,
+            this.退出ToolStripMenuItem});
+            this.ContextMenu_NotifyIcon.Name = "ContextMenu_NotifyIcon";
+            this.ContextMenu_NotifyIcon.Size = new System.Drawing.Size(154, 52);
+            // 
+            // 打开主界面ToolStripMenuItem
+            // 
+            this.打开主界面ToolStripMenuItem.Name = "打开主界面ToolStripMenuItem";
+            this.打开主界面ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.打开主界面ToolStripMenuItem.Text = "打开主界面";
+            this.打开主界面ToolStripMenuItem.Click += new System.EventHandler(this.打开主界面ToolStripMenuItem_Click);
+            // 
+            // 退出ToolStripMenuItem
+            // 
+            this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
+            this.退出ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.退出ToolStripMenuItem.Text = "退出";
+            this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(369, 210);
+            this.ClientSize = new System.Drawing.Size(378, 201);
             this.Controls.Add(this.SettingButton);
             this.Controls.Add(this.CheckButton);
             this.Controls.Add(this.ConnectButton);
@@ -118,6 +157,8 @@
             this.Text = "一键联网";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
+            this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
+            this.ContextMenu_NotifyIcon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -131,6 +172,10 @@
         private System.Windows.Forms.Button CheckButton;
         public System.Windows.Forms.Label findLabel;
         private System.Windows.Forms.Button SettingButton;
+        private System.Windows.Forms.NotifyIcon NotifyIcon;
+        private System.Windows.Forms.ContextMenuStrip ContextMenu_NotifyIcon;
+        private System.Windows.Forms.ToolStripMenuItem 打开主界面ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
     }
 }
 

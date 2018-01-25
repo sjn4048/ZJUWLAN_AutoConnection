@@ -39,6 +39,8 @@
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.ContextMenu_NotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.打开主界面ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.一键连接AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ContextMenu_NotifyIcon.SuspendLayout();
             this.SuspendLayout();
@@ -110,7 +112,6 @@
             // NotifyIcon
             // 
             this.NotifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.NotifyIcon.BalloonTipText = "我在这里~双击打开我~";
             this.NotifyIcon.ContextMenuStrip = this.ContextMenu_NotifyIcon;
             this.NotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon.Icon")));
             this.NotifyIcon.Text = "ZJUWLAN自动连接";
@@ -122,22 +123,35 @@
             this.ContextMenu_NotifyIcon.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.ContextMenu_NotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.打开主界面ToolStripMenuItem,
+            this.一键连接AToolStripMenuItem,
+            this.toolStripMenuItem1,
             this.退出ToolStripMenuItem});
             this.ContextMenu_NotifyIcon.Name = "ContextMenu_NotifyIcon";
-            this.ContextMenu_NotifyIcon.Size = new System.Drawing.Size(154, 52);
+            this.ContextMenu_NotifyIcon.Size = new System.Drawing.Size(176, 82);
             // 
             // 打开主界面ToolStripMenuItem
             // 
             this.打开主界面ToolStripMenuItem.Name = "打开主界面ToolStripMenuItem";
             this.打开主界面ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
-            this.打开主界面ToolStripMenuItem.Text = "打开主界面";
+            this.打开主界面ToolStripMenuItem.Text = "打开主界面(&O)";
             this.打开主界面ToolStripMenuItem.Click += new System.EventHandler(this.打开主界面ToolStripMenuItem_Click);
+            // 
+            // 一键连接AToolStripMenuItem
+            // 
+            this.一键连接AToolStripMenuItem.Name = "一键连接AToolStripMenuItem";
+            this.一键连接AToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.一键连接AToolStripMenuItem.Text = "一键连接(&A)";
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(172, 6);
             // 
             // 退出ToolStripMenuItem
             // 
             this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
             this.退出ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
-            this.退出ToolStripMenuItem.Text = "退出";
+            this.退出ToolStripMenuItem.Text = "退出(&X)";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
             // 
             // MainForm
@@ -176,6 +190,8 @@
         private System.Windows.Forms.ContextMenuStrip ContextMenu_NotifyIcon;
         private System.Windows.Forms.ToolStripMenuItem 打开主界面ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 一键连接AToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
     }
 }
 

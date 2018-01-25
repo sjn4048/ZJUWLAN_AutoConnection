@@ -147,7 +147,11 @@ namespace ZJUWLAN_Connection
             if (wifiRequest.IsNetAvailable)
             {
                 if (Config.isAutoHide)
-                    this.Close();
+                {
+                    this.Hide();
+                    this.ShowInTaskbar = false;
+                    this.NotifyIcon.ShowBalloonTip(2000, "", "已经帮主人连好Wifi啦~需要的时候双击打开我噢~", ToolTipIcon.Info);
+                }
                 DisplayResult(wifiRequest);
                 Process autoProcess = new Process();
                 autoProcess.StartInfo.CreateNoWindow = true;
@@ -170,17 +174,19 @@ namespace ZJUWLAN_Connection
         {
             if (this.WindowState == FormWindowState.Minimized)
                 this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
         }
 
         private void 打开主界面ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Show();
+            if (this.WindowState == FormWindowState.Minimized)
+                this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
-            this.NotifyIcon.Visible = false;
         }
 
         private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            NotifyIcon.Visible = false;
             this.Close();
         }
 
@@ -188,8 +194,6 @@ namespace ZJUWLAN_Connection
         {
             if (WindowState == FormWindowState.Minimized)
             {
-                this.Hide();
-                this.NotifyIcon.Visible = true;
                 this.ShowInTaskbar = false;
                 this.NotifyIcon.ShowBalloonTip(2000, "", "我在这里~需要的时候双击打开我噢~", ToolTipIcon.Info);
             }

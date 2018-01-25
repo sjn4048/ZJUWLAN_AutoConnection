@@ -59,9 +59,9 @@
             this.autoHideCheckBox.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.autoHideCheckBox.Location = new System.Drawing.Point(40, 130);
             this.autoHideCheckBox.Name = "autoHideCheckBox";
-            this.autoHideCheckBox.Size = new System.Drawing.Size(185, 27);
+            this.autoHideCheckBox.Size = new System.Drawing.Size(219, 27);
             this.autoHideCheckBox.TabIndex = 1;
-            this.autoHideCheckBox.Text = "连接后自动关闭程序";
+            this.autoHideCheckBox.Text = "连接后自动隐藏到任务栏";
             this.autoHideCheckBox.UseVisualStyleBackColor = true;
             // 
             // textBox1

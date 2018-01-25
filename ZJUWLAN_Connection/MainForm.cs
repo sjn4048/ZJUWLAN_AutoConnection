@@ -148,7 +148,7 @@ namespace ZJUWLAN_Connection
             {
                 if (Config.isAutoHide)
                 {
-                    this.Hide();
+                    this.WindowState = FormWindowState.Minimized;
                     this.ShowInTaskbar = false;
                     this.NotifyIcon.ShowBalloonTip(2000, "", "已经帮主人连好Wifi啦~需要的时候双击打开我噢~", ToolTipIcon.Info);
                 }

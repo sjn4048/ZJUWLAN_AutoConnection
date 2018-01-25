@@ -40,18 +40,26 @@ namespace ZJUWLAN_Connection
                 username = configPart[4];
                 password = configPart[5];
             }
-            if (isAutoBoot && !SetAutoBootStatus(isAutoBoot))
-            {
-                MessageBox.Show(text: "开机自启动需要管理员权限。请退出程序，并右键以管理员身份重新打开程序进行设置。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
-                isAutoBoot = false;
-            }
+            //似乎不是必要的，删除。
+            //if (isAutoBoot && !SetAutoBootStatus(isAutoBoot))
+            //{
+            //    MessageBox.Show(text: "开机自启动需要管理员权限。请退出程序，并右键以管理员身份重新打开程序进行设置。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
+            //    isAutoBoot = false;
+            //}
         }
         public static void SetConfig(bool autoConnection, bool autoHide, bool zjuFirst, bool autoBoot, string username, string password)
         {
-            if (!IsAdministrator() && (autoBoot != isAutoBoot))
+            if (autoBoot != isAutoBoot)
             {
-                MessageBox.Show(text: "开机自启动需要管理员权限。请退出程序，并右键以管理员身份重新打开程序进行设置。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
-                autoBoot = isAutoBoot;
+                if (!IsAdministrator())
+                {
+                    MessageBox.Show(text: "开机自启动需要管理员权限。请退出程序，并右键以管理员身份重新打开程序进行设置。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
+                    autoBoot = isAutoBoot;
+                }
+                else
+                {
+                    SetAutoBootStatus(isAutoBoot);
+                }
             }
             using (var configSr = new StreamWriter(new FileStream(configPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite)))
             {

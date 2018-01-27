@@ -13,20 +13,21 @@ namespace ZJUWLAN_Connection
 {
     public static class Config
     {
-        public static bool isAutoConnection;//打开后自动连接
-        public static bool isAutoHide;//连接后自动关闭
-        public static bool isZJUWLANFirst;//总是优先连接zjuwlan
-        public static bool isAutoBoot;//开机自动启动
-        public static string username;//用户名
-        public static string password;//密码
-        public static string execute_path; //跟随软件自启动的任务地址
+        public static bool isAutoConnection = false;//打开后自动连接
+        public static bool isAutoHide = false;//连接后自动关闭
+        public static bool isZJUWLANFirst = false;//总是优先连接zjuwlan
+        public static bool isAutoBoot = false;//开机自动启动
+        public static bool isNotClose = false;//不关闭，改为右下角托盘
+        public static string username = string.Empty;//用户名
+        public static string password = string.Empty;//密码
+        public static string execute_path = string.Empty; //跟随软件自启动的任务地址
 
         public static string configPath = $"{AppDomain.CurrentDomain.BaseDirectory}config.ini";
 
 
-        public static void ReadConfig()
+        public static void ReadConfig() //读取配置文件
         {
-            if (!File.Exists(configPath))
+            if (!File.Exists(configPath)) //若文件不存在
             {
                 throw new Exception("无法读取文件");
             }
@@ -37,8 +38,9 @@ namespace ZJUWLAN_Connection
                 isAutoHide = bool.Parse(configPart[1]);
                 isZJUWLANFirst = bool.Parse(configPart[2]);
                 isAutoBoot = bool.Parse(configPart[3]);
-                username = configPart[4];
-                password = configPart[5];
+                isNotClose = bool.Parse(configPart[4]);
+                username = configPart[5];
+                password = configPart[6];
             }
             //似乎不是必要的，删除。
             //if (isAutoBoot && !SetAutoBootStatus(isAutoBoot))
@@ -47,7 +49,7 @@ namespace ZJUWLAN_Connection
             //    isAutoBoot = false;
             //}
         }
-        public static void SetConfig(bool autoConnection, bool autoHide, bool zjuFirst, bool autoBoot, string username, string password)
+        public static void SetConfig(bool autoConnection, bool autoHide, bool zjuFirst, bool autoBoot, bool notClose, string username, string password)
         {
             if (autoBoot != isAutoBoot)
             {
@@ -61,9 +63,9 @@ namespace ZJUWLAN_Connection
                     SetAutoBootStatus(isAutoBoot);
                 }
             }
-            using (var configSr = new StreamWriter(new FileStream(configPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite)))
+            using (var configSr = new StreamWriter(new FileStream(configPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))) //写入文件
             {
-                string configString = $"{autoConnection},{autoHide},{zjuFirst},{autoBoot},{username},{password}";
+                string configString = $"{autoConnection},{autoHide},{zjuFirst},{autoBoot},{notClose},{username},{password}";
                 configSr.Write(configString);
             }
             ReadConfig();

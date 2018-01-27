@@ -28,16 +28,22 @@ namespace ZJUWLAN_Connection
             autoHideCheckBox.Checked = Config.isAutoHide;
             zjuFirst.Checked = Config.isZJUWLANFirst;
             autoBootCheckBox.Checked = Config.isAutoBoot;
+            closeCheckBox.Checked = Config.isNotClose;
             textBox1.Text = Config.username;
             textBox2.Text = Config.password;
         }
 
         private void OKButton_Click(object sender, EventArgs e)
         {
-            Config.SetConfig(autoConnectionCheckBox.Checked, autoHideCheckBox.Checked, zjuFirst.Checked, autoBootCheckBox.Checked, textBox1.Text, textBox2.Text);
+            Config.SetConfig(autoConnectionCheckBox.Checked, autoHideCheckBox.Checked, zjuFirst.Checked, autoBootCheckBox.Checked, closeCheckBox.Checked,textBox1.Text, textBox2.Text);
             ShowConfig();
             MessageBox.Show(text:"已成功更改设置。",caption:"成功",icon: MessageBoxIcon.Asterisk, buttons:MessageBoxButtons.OK);
             this.Close();
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

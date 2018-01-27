@@ -126,7 +126,7 @@ namespace ZJUWLAN_Connection
                 myStreamWriter.Write(data);
                 myStreamWriter.Close();
                 response = (HttpWebResponse)request.GetResponse();
-            } while ((response == null || response.StatusCode != HttpStatusCode.OK) && i++ < 20);
+            } while ((response == null || response.StatusCode != HttpStatusCode.OK) && i++ < 10);
         }
 
         public string GetCurrentConnection(string WlanToBeChecked)//负责获取当前连接的WIFI的名字，并建立WIFISSID类的对象
@@ -155,13 +155,13 @@ namespace ZJUWLAN_Connection
 
         public string StringToHex(string str)//字符串转换工具。不用管它。
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
             byte[] byStr = System.Text.Encoding.Default.GetBytes(str);//默认是System.Text.Encoding.Default.GetBytes(str)    
             for (int i = 0; i < byStr.Length; i++)
             {
-                sb.Append(Convert.ToString(byStr[i], 16));
+                stringBuilder.Append(Convert.ToString(byStr[i], 16));
             }
-            return (sb.ToString().ToUpper());
+            return (stringBuilder.ToString().ToUpper());
         }
 
         public string GetStringForSSID(Wlan.Dot11Ssid ssid)//字符串转换工具，不用管它。

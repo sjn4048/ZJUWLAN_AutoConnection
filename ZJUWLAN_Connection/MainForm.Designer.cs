@@ -42,6 +42,8 @@
             this.一键连接AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.ContextMenu_NotifyIcon.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -124,10 +126,12 @@
             this.ContextMenu_NotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.打开主界面ToolStripMenuItem,
             this.一键连接AToolStripMenuItem,
+            this.toolStripMenuItem2,
+            this.设置ToolStripMenuItem,
             this.toolStripMenuItem1,
             this.退出ToolStripMenuItem});
             this.ContextMenu_NotifyIcon.Name = "ContextMenu_NotifyIcon";
-            this.ContextMenu_NotifyIcon.Size = new System.Drawing.Size(176, 82);
+            this.ContextMenu_NotifyIcon.Size = new System.Drawing.Size(176, 112);
             // 
             // 打开主界面ToolStripMenuItem
             // 
@@ -140,7 +144,7 @@
             // 
             this.一键连接AToolStripMenuItem.Name = "一键连接AToolStripMenuItem";
             this.一键连接AToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
-            this.一键连接AToolStripMenuItem.Text = "一键连接(&A)";
+            this.一键连接AToolStripMenuItem.Text = "一键连接(&C)";
             // 
             // toolStripMenuItem1
             // 
@@ -153,6 +157,18 @@
             this.退出ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.退出ToolStripMenuItem.Text = "退出(&X)";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
+            // 
+            // 设置ToolStripMenuItem
+            // 
+            this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
+            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.设置ToolStripMenuItem.Text = "设置(&S)";
+            this.设置ToolStripMenuItem.Click += new System.EventHandler(this.设置ToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(172, 6);
             // 
             // MainForm
             // 
@@ -168,7 +184,9 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainForm";
+            this.ShowIcon = false;
             this.Text = "一键联网";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
@@ -192,6 +210,8 @@
         private System.Windows.Forms.ToolStripMenuItem 退出ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 一键连接AToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem 设置ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
     }
 }
 

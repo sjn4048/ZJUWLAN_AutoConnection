@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoUpdate.cs" />
     <Compile Include="ConfigCode.cs" />
     <Compile Include="HttpRequest.cs" />
     <Compile Include="MainForm.cs">
@@ -105,7 +106,6 @@
     <None Include="Resources\Settings.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icon.ico" />
     <Content Include="WIFI.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

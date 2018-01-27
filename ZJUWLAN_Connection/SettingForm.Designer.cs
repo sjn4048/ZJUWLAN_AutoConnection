@@ -39,6 +39,7 @@
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.zjuFirst = new System.Windows.Forms.CheckBox();
             this.autoBootCheckBox = new System.Windows.Forms.CheckBox();
+            this.closeCheckBox = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -103,7 +104,7 @@
             // OKButton
             // 
             this.OKButton.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.OKButton.Location = new System.Drawing.Point(115, 237);
+            this.OKButton.Location = new System.Drawing.Point(109, 277);
             this.OKButton.Name = "OKButton";
             this.OKButton.Size = new System.Drawing.Size(90, 35);
             this.OKButton.TabIndex = 6;
@@ -116,7 +117,7 @@
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 294);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 328);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(315, 25);
             this.statusStrip1.TabIndex = 7;
@@ -151,17 +152,30 @@
             this.autoBootCheckBox.Text = "开机自动启动";
             this.autoBootCheckBox.UseVisualStyleBackColor = true;
             // 
+            // closeCheckBox
+            // 
+            this.closeCheckBox.AutoSize = true;
+            this.closeCheckBox.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.closeCheckBox.Location = new System.Drawing.Point(40, 227);
+            this.closeCheckBox.Name = "closeCheckBox";
+            this.closeCheckBox.Size = new System.Drawing.Size(253, 27);
+            this.closeCheckBox.TabIndex = 1;
+            this.closeCheckBox.Text = "关闭时最小化到托盘（推荐）";
+            this.closeCheckBox.UseVisualStyleBackColor = true;
+            this.closeCheckBox.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
             // SettingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(315, 319);
+            this.ClientSize = new System.Drawing.Size(315, 353);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.OKButton);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.closeCheckBox);
             this.Controls.Add(this.autoBootCheckBox);
             this.Controls.Add(this.zjuFirst);
             this.Controls.Add(this.autoHideCheckBox);
@@ -189,5 +203,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.CheckBox zjuFirst;
         private System.Windows.Forms.CheckBox autoBootCheckBox;
+        private System.Windows.Forms.CheckBox closeCheckBox;
     }
 }

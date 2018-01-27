@@ -135,18 +135,17 @@ namespace ZJUWLAN_Connection
             foreach (WlanClient.WlanInterface wlanIface in client.Interfaces)
             {
                 Wlan.WlanAvailableNetwork[] networks = wlanIface.GetAvailableNetworkList(0);
-                if (networks.Any(n => n.profileName == WlanToBeChecked))
-                {
+                if (networks.Any(n => n.profileName == WlanToBeChecked)) //如果列表中包含需要探测的wifi
                     IsZJUWlanDetected = true;
-                    var ZJUWlanNetwork = networks.Where(n => n.profileName == WlanToBeChecked).First();
-                    WIFISSID.WlanSsid.wlanInterface = wlanIface;
-                    WIFISSID.WlanSsid.wlanSignalQuality = (int)ZJUWlanNetwork.wlanSignalQuality;
-                    WIFISSID.WlanSsid.SSID = GetStringForSSID(ZJUWlanNetwork.dot11Ssid);
-                    WIFISSID.WlanSsid.dot11DefaultAuthAlgorithm = ZJUWlanNetwork.dot11DefaultAuthAlgorithm.ToString();
-                }
 
                 if (wlanIface.InterfaceState == Wlan.WlanInterfaceState.Connected && wlanIface.CurrentConnection.isState == Wlan.WlanInterfaceState.Connected)
                 {
+                    var currentNetwork = networks.Where(n => n.profileName == wlanIface.CurrentConnection.profileName).First(); //这一句写的太蠢了，有空一定要改
+                    WIFISSID.WlanSsid.wlanInterface = wlanIface;
+                    WIFISSID.WlanSsid.wlanSignalQuality = (int)currentNetwork.wlanSignalQuality;
+                    WIFISSID.WlanSsid.SSID = GetStringForSSID(currentNetwork.dot11Ssid);
+                    WIFISSID.WlanSsid.dot11DefaultAuthAlgorithm = currentNetwork.dot11DefaultAuthAlgorithm.ToString();
+
                     return wlanIface.CurrentConnection.profileName;
                 }
             }

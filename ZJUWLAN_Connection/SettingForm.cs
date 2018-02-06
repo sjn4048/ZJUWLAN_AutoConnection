@@ -35,10 +35,15 @@ namespace ZJUWLAN_Connection
 
         private void OKButton_Click(object sender, EventArgs e)
         {
-            Config.SetConfig(autoConnectionCheckBox.Checked, autoHideCheckBox.Checked, zjuFirst.Checked, autoBootCheckBox.Checked, closeCheckBox.Checked,textBox1.Text, textBox2.Text);
-            ShowConfig();
-            MessageBox.Show(text:"已成功更改设置。",caption:"成功",icon: MessageBoxIcon.Asterisk, buttons:MessageBoxButtons.OK);
-            this.Close();
+            var result = Config.SetConfig(autoConnectionCheckBox.Checked, autoHideCheckBox.Checked, zjuFirst.Checked, autoBootCheckBox.Checked, closeCheckBox.Checked, textBox1.Text, textBox2.Text);
+            if (result == false)
+                return;
+            else
+            {
+                ShowConfig();
+                MessageBox.Show(text: "已成功更改设置。", caption: "成功", icon: MessageBoxIcon.Asterisk, buttons: MessageBoxButtons.OK);
+                this.Close();
+            }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)

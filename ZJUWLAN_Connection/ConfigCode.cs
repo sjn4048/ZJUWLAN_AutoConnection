@@ -18,6 +18,7 @@ namespace ZJUWLAN_Connection
         public static bool isZJUWLANFirst = false;//总是优先连接zjuwlan
         public static bool isAutoBoot = false;//开机自动启动
         public static bool isNotClose = false;//不关闭，改为右下角托盘
+        public static bool isFirstUse = true; //判断是否是第一次打开程序，方便加载使用说明等
         public static string username = string.Empty;//用户名
         public static string password = string.Empty;//密码
         public static string execute_path = string.Empty; //跟随软件自启动的任务地址
@@ -39,8 +40,9 @@ namespace ZJUWLAN_Connection
                 isZJUWLANFirst = bool.Parse(configPart[2]);
                 isAutoBoot = bool.Parse(configPart[3]);
                 isNotClose = bool.Parse(configPart[4]);
-                username = configPart[5];
-                password = configPart[6];
+                isFirstUse = bool.Parse(configPart[5]);
+                username = configPart[6];
+                password = configPart[7];
             }
             //似乎不是必要的，删除。
             //if (isAutoBoot && !SetAutoBootStatus(isAutoBoot))
@@ -49,7 +51,13 @@ namespace ZJUWLAN_Connection
             //    isAutoBoot = false;
             //}
         }
-        public static void SetConfig(bool autoConnection, bool autoHide, bool zjuFirst, bool autoBoot, bool notClose, string username, string password)
+        public static bool SetConfig(bool autoConnection,
+                                     bool autoHide, 
+                                     bool zjuFirst, 
+                                     bool autoBoot, 
+                                     bool notClose, 
+                                     string username, 
+                                     string password)//返回值为是否设置成功
         {
             if (autoBoot != isAutoBoot)
             {
@@ -57,6 +65,7 @@ namespace ZJUWLAN_Connection
                 {
                     MessageBox.Show(text: "开机自启动需要管理员权限。请退出程序，并右键以管理员身份重新打开程序进行设置。", caption: "自启动设置失败", icon: MessageBoxIcon.Warning, buttons: MessageBoxButtons.OK);
                     autoBoot = isAutoBoot;
+                    return false;
                 }
                 else
                 {
@@ -65,10 +74,23 @@ namespace ZJUWLAN_Connection
             }
             using (var configSr = new StreamWriter(new FileStream(configPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))) //写入文件
             {
-                string configString = $"{autoConnection},{autoHide},{zjuFirst},{autoBoot},{notClose},{username},{password}";
+                string configString = $"{autoConnection},{autoHide},{zjuFirst},{autoBoot},{notClose},{isFirstUse},{username},{password}";
                 configSr.Write(configString);
             }
             ReadConfig();
+            return true;
+        }
+
+        public static bool SetConfig(bool firstUse)
+        {
+            isFirstUse = firstUse;
+            using (var configSr = new StreamWriter(new FileStream(configPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))) //写入文件
+            {
+                string configString = $"{isAutoConnection},{isAutoHide},{isZJUWLANFirst},{isAutoBoot},{isNotClose},{isFirstUse},{username},{password}";
+                configSr.Write(configString);
+            }
+            ReadConfig();
+            return true;
         }
 
         public static bool SetAutoBootStatus(bool isAutoBoot)//设置开机自启动

@@ -118,6 +118,10 @@ namespace ZJUWLAN_Connection
             request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; Tridene/7.0; rv:11.0) like Gecko";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = Encoding.UTF8.GetByteCount(data);
+            request.Host = "net.zju.edu.cn";
+
+            var data_byte = Encoding.Default.GetBytes(data);
+
             Stream myRequestStream = request.GetRequestStream();
             int i = 0;
             do
@@ -125,6 +129,7 @@ namespace ZJUWLAN_Connection
                 StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
                 myStreamWriter.Write(data);
                 myStreamWriter.Close();
+                Thread.Sleep(10);
                 response = (HttpWebResponse)request.GetResponse();
             } while ((response == null || response.StatusCode != HttpStatusCode.OK) && i++ < 10);
         }

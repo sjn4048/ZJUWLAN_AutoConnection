@@ -40,10 +40,10 @@
             this.ContextMenu_NotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.打开主界面ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.一键连接AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.ContextMenu_NotifyIcon.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -146,6 +146,18 @@
             this.一键连接AToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.一键连接AToolStripMenuItem.Text = "一键连接(&C)";
             // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(172, 6);
+            // 
+            // 设置ToolStripMenuItem
+            // 
+            this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
+            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
+            this.设置ToolStripMenuItem.Text = "设置(&S)";
+            this.设置ToolStripMenuItem.Click += new System.EventHandler(this.设置ToolStripMenuItem_Click);
+            // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
@@ -157,18 +169,6 @@
             this.退出ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
             this.退出ToolStripMenuItem.Text = "退出(&X)";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
-            // 
-            // 设置ToolStripMenuItem
-            // 
-            this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
-            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(175, 24);
-            this.设置ToolStripMenuItem.Text = "设置(&S)";
-            this.设置ToolStripMenuItem.Click += new System.EventHandler(this.设置ToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(172, 6);
             // 
             // MainForm
             // 

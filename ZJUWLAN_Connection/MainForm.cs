@@ -61,6 +61,11 @@ namespace ZJUWLAN_Connection
                 catch
                 {
                     MessageBox.Show(text: "进入程序后请先进行设置", caption: "尚未设置", icon: MessageBoxIcon.Information, buttons: MessageBoxButtons.OK);
+                    new SettingForm()
+                    {
+                        TopMost = true
+                    }.ShowDialog();
+                    
                 }
                 DisplayResult(wifiRequest);
                 if (Config.isAutoConnection)
@@ -142,7 +147,7 @@ namespace ZJUWLAN_Connection
         private void SettingButton_Click(object sender, EventArgs e)
         {
             new SettingForm() { TopMost = true }
-            .Show();
+            .ShowDialog();
         }
 
         private void ConnectWifi(string wifiSSID = "ZJUWLAN", bool showFailReason = true)
@@ -159,7 +164,7 @@ namespace ZJUWLAN_Connection
                 {
                     this.WindowState = FormWindowState.Minimized;
                     this.ShowInTaskbar = false;
-                    this.NotifyIcon.ShowBalloonTip(2000, "", "已经帮主人连好Wifi啦~需要的时候双击打开我噢~", ToolTipIcon.Info);
+                    this.NotifyIcon.ShowBalloonTip(2000, "连接成功", "已经帮主人连好Wifi啦~", ToolTipIcon.Info);
                 }
                 DisplayResult(wifiRequest);
                 Process autoProcess = new Process();
@@ -215,7 +220,11 @@ namespace ZJUWLAN_Connection
             if (WindowState == FormWindowState.Minimized)
             {
                 this.ShowInTaskbar = false;
-                this.NotifyIcon.ShowBalloonTip(2000, "", "我在这里~需要的时候双击打开我噢~", ToolTipIcon.Info);
+                if (Config.isFirstUse)
+                {
+                    this.NotifyIcon.ShowBalloonTip(2000, "", "我在这里~需要的时候双击打开我噢~", ToolTipIcon.Info);
+                    Config.SetConfig(firstUse: false);
+                }
             }
         }
 
@@ -232,7 +241,7 @@ namespace ZJUWLAN_Connection
         private void 设置ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             new SettingForm() { TopMost = true }
-            .Show();
+            .ShowDialog();
         }
 
         protected override void WndProc(ref Message msg) //右上角关闭窗体后，不自动关闭程序
@@ -246,7 +255,7 @@ namespace ZJUWLAN_Connection
                 {
                     this.WindowState = FormWindowState.Minimized;
                     this.ShowInTaskbar = false;
-                    this.NotifyIcon.ShowBalloonTip(2000, "", "我在这里~需要的时候双击打开我噢~", ToolTipIcon.Info);
+                    //this.NotifyIcon.ShowBalloonTip(2000, "", "我在这里~需要的时候双击打开我噢~", ToolTipIcon.Info);
                 }
                 // 加入不关闭的逻辑处理
 

@@ -167,12 +167,14 @@ namespace ZJUWLAN_Connection
                     this.NotifyIcon.ShowBalloonTip(2000, "连接成功", "已经帮主人连好Wifi啦~", ToolTipIcon.Info);
                 }
                 DisplayResult(wifiRequest);
+                /* 自动脚本区域，暂时删掉放到linux上了
                 Process autoProcess = new Process();
                 autoProcess.StartInfo.CreateNoWindow = true;
                 autoProcess.StartInfo.UseShellExecute = false;
                 autoProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                autoProcess.StartInfo.FileName = @"D:\Code\python\PyCharmProjects\AutoLoginToZJUTV.com\Autologin.bat";
+                autoProcess.StartInfo.FileName = "";
                 autoProcess.Start();//可改成执行任务部分
+                */
                 return;
             }
 

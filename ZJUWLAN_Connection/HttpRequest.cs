@@ -141,16 +141,17 @@ namespace ZJUWLAN_Connection
             {
                 Wlan.WlanAvailableNetwork[] networks = wlanIface.GetAvailableNetworkList(0);
                 if (networks.Any(n => n.profileName == WlanToBeChecked)) //如果列表中包含需要探测的wifi
-                    IsZJUWlanDetected = true;
-
-                if (wlanIface.InterfaceState == Wlan.WlanInterfaceState.Connected && wlanIface.CurrentConnection.isState == Wlan.WlanInterfaceState.Connected)
                 {
-                    var currentNetwork = networks.Where(n => n.profileName == wlanIface.CurrentConnection.profileName).First(); //这一句写的太蠢了，有空一定要改
-                    WIFISSID.WlanSsid.wlanInterface = wlanIface;
+                    IsZJUWlanDetected = true;
+                    var currentNetwork = networks.FirstOrDefault(n => n.profileName == WlanToBeChecked); //这一句写的太蠢了，有空一定要改
                     WIFISSID.WlanSsid.wlanSignalQuality = (int)currentNetwork.wlanSignalQuality;
                     WIFISSID.WlanSsid.SSID = GetStringForSSID(currentNetwork.dot11Ssid);
                     WIFISSID.WlanSsid.dot11DefaultAuthAlgorithm = currentNetwork.dot11DefaultAuthAlgorithm.ToString();
+                    WIFISSID.WlanSsid.wlanInterface = wlanIface;
+                }
 
+                if (wlanIface.InterfaceState == Wlan.WlanInterfaceState.Connected && wlanIface.CurrentConnection.isState == Wlan.WlanInterfaceState.Connected)
+                {
                     return wlanIface.CurrentConnection.profileName;
                 }
             }
@@ -175,9 +176,6 @@ namespace ZJUWLAN_Connection
 
         public int JudgeSystemWifiState()//判断系统wifi开关是否打开，还没写好
         {
-
-
-
             return 0;
         }
 

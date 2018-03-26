@@ -25,13 +25,13 @@ namespace ZJUWLAN_Connection
             Control.CheckForIllegalCrossThreadCalls = false; //解决跨窗体传参的问题
             InitializeComponent();
             SystemEvents.PowerModeChanged += OnPowerChange; //如果从睡眠中恢复，则自动连接
-            NetworkChange.NetworkAddressChanged += new NetworkAddressChangedEventHandler(NetworkChangedCallback); //如果ip地址改变
             NetworkChange.NetworkAvailabilityChanged += new NetworkAvailabilityChangedEventHandler(NetworkChangedCallback); //如果ip地址改变
 
         }
 
         private void NetworkChangedCallback(object sender, EventArgs e) //改变ip或网络条件后的行为
         {
+            
             ConnectWifi(showFailReason: false);//后台自动连接时，不弹出失败原因，失败就失败了吧
         }
 
@@ -152,48 +152,55 @@ namespace ZJUWLAN_Connection
 
         private void ConnectWifi(string wifiSSID = "ZJUWLAN", bool showFailReason = true)
         {
-            findLabel.Text = $"尝试连接{wifiSSID}";
-            findLabel.ForeColor = Color.DarkGreen;
-            connectLabel.Text = "连接中...";
-            connectLabel.ForeColor = Color.MediumBlue;
-
-            var result = wifiRequest.OverallConnection(out signalQuality, out pingTime, wifiSSID);
-            if (wifiRequest.IsNetAvailable)
+            try
             {
-                if (Config.isAutoHide)
+                findLabel.Text = $"尝试连接{wifiSSID}";
+                findLabel.ForeColor = Color.DarkGreen;
+                connectLabel.Text = "连接中...";
+                connectLabel.ForeColor = Color.MediumBlue;
+
+                var result = wifiRequest.OverallConnection(out signalQuality, out pingTime, wifiSSID);
+                if (wifiRequest.IsNetAvailable)
                 {
-                    this.WindowState = FormWindowState.Minimized;
-                    this.ShowInTaskbar = false;
-                    this.NotifyIcon.ShowBalloonTip(2000, "连接成功", "已经帮主人连好Wifi啦~", ToolTipIcon.Info);
+                    if (Config.isAutoHide)
+                    {
+                        this.WindowState = FormWindowState.Minimized;
+                        this.ShowInTaskbar = false;
+                        this.NotifyIcon.ShowBalloonTip(2000, "连接成功", "已经帮主人连好Wifi啦~", ToolTipIcon.Info);
+                    }
+                    DisplayResult(wifiRequest);
+                    /* 自动脚本区域，暂时删掉放到linux上了
+                    Process autoProcess = new Process();
+                    autoProcess.StartInfo.CreateNoWindow = true;
+                    autoProcess.StartInfo.UseShellExecute = false;
+                    autoProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    autoProcess.StartInfo.FileName = "";
+                    autoProcess.Start();//可改成执行任务部分
+                    */
+                    return;
                 }
-                DisplayResult(wifiRequest);
-                /* 自动脚本区域，暂时删掉放到linux上了
-                Process autoProcess = new Process();
-                autoProcess.StartInfo.CreateNoWindow = true;
-                autoProcess.StartInfo.UseShellExecute = false;
-                autoProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                autoProcess.StartInfo.FileName = "";
-                autoProcess.Start();//可改成执行任务部分
-                */
-                return;
-            }
 
-            if (!showFailReason) //如果不显示失败原因
-            {
-                NotifyIcon.ShowBalloonTip(2000, "重连失败", "自动重连wifi失败，点击查看详情", ToolTipIcon.Warning);
-                NotifyIcon.BalloonTipClicked += (s, arg) =>
+                if (!showFailReason) //如果不显示失败原因
+                {
+                    NotifyIcon.ShowBalloonTip(2000, "重连失败", "自动重连wifi失败，点击查看详情", ToolTipIcon.Warning);
+                    NotifyIcon.BalloonTipClicked += (s, arg) =>
+                    {
+                        if (MessageBox.Show(text: $"连接失败，错误码：{result}，请尝试点击“重试”。如仍无法连接，请检查①用户名/密码是否正确，②是否{wifiSSID}信号过弱，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.RetryCancel) == DialogResult.Retry)
+                            ConnectWifi(wifiSSID);
+                        else DisplayResult(wifiRequest);
+                    };
+                }
+                else if (showFailReason) //如果显示失败原因
                 {
                     if (MessageBox.Show(text: $"连接失败，错误码：{result}，请尝试点击“重试”。如仍无法连接，请检查①用户名/密码是否正确，②是否{wifiSSID}信号过弱，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.RetryCancel) == DialogResult.Retry)
                         ConnectWifi(wifiSSID);
-                    else DisplayResult(wifiRequest);
-                };
+                    else
+                        DisplayResult(wifiRequest);
+                }
             }
-            else if (showFailReason) //如果显示失败原因
+            catch (Exception ex)
             {
-                if (MessageBox.Show(text: $"连接失败，错误码：{result}，请尝试点击“重试”。如仍无法连接，请检查①用户名/密码是否正确，②是否{wifiSSID}信号过弱，③是否已经连接到了其他网络。如仍不能解决，请联系作者 1176827825@qq.com", caption: "Oops", icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.RetryCancel) == DialogResult.Retry)
-                    ConnectWifi(wifiSSID);
-                else
-                    DisplayResult(wifiRequest);
+                MessageBox.Show(ex.Message + " ## " + ex.TargetSite + " ## " + ex.StackTrace);
             }
         }
 

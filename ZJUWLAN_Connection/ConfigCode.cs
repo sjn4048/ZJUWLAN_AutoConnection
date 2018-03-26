@@ -69,7 +69,7 @@ namespace ZJUWLAN_Connection
                 }
                 else
                 {
-                    SetAutoBootStatus(isAutoBoot);
+                    SetAutoBootStatus(autoBoot);
                 }
             }
             using (var configSr = new StreamWriter(new FileStream(configPath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite))) //写入文件

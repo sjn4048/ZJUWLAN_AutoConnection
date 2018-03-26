@@ -7,6 +7,7 @@ using NativeWifi;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ZJUWLAN_Connection
 {
@@ -37,14 +38,11 @@ namespace ZJUWLAN_Connection
         {
             signalQuality = WIFISSID.WlanSsid.wlanSignalQuality;
             pingTime = -1;
-
             string currentWifiName = GetCurrentConnection(wifiSSID);
             if (currentWifiName == string.Empty)
                 WlanStatus = WlanStatusEnum.Unconnected;
-
             else if (currentWifiName != string.Empty && currentWifiName != wifiSSID)
                 WlanStatus = WlanStatusEnum.OtherWlan;
-
             else if (currentWifiName == "ZJUWLAN")
                 WlanStatus = WlanStatusEnum.ZJUWlan;
 
@@ -60,7 +58,7 @@ namespace ZJUWLAN_Connection
                     pingTime = (int)reply.RoundtripTime;
                     if (reply.Status == IPStatus.Success)
                     {
-                        IsNetAvailable = true;
+                        IsNetAvailable = true; //different #1
                         return;
                     }
                 }
@@ -79,9 +77,9 @@ namespace ZJUWLAN_Connection
                 return ConnectionResult.AlreadyConnected;
             else if (IsNetAvailable && Config.isZJUWLANFirst) //若设置中要求一定要连接ZJUWLAN
                 connectionResult = ConnectionResult.AlteredToZJUWLAN;
-            
+
             if (!IsZJUWlanDetected) //如果未发现ZJUWLAN
-                return ConnectionResult.Unfound;          
+                return ConnectionResult.Unfound;
 
             if (WlanStatus != WlanStatusEnum.ZJUWlan) //如果未连接ZJUWLAN，先连接上
                 ConnectWifi(wifiSSID);
@@ -90,7 +88,7 @@ namespace ZJUWLAN_Connection
             if (IsNetAvailable)
                 return ConnectionResult.Success;
 
-            PostZJUWLAN(Config.username, Config.password); //发送请求
+            PostZJUWLAN(Config.username, Config.password); //发送请求 different #2
 
             CheckWifiState(out signalQuality, out pingTime); //检查当前网络状态，返回对应的状态
             if (IsNetAvailable)
@@ -109,29 +107,41 @@ namespace ZJUWLAN_Connection
 
         private void PostZJUWLAN(string username, string password)//只负责POST用户名与密码，不负责判断WIFI是否连上
         {
+
             var data = $"action=login&username={username}&password={password}&ac_id=3&user_ip=&nas_ip=&user_mac=&save_me=1&ajax=1";
             string url = "https://net.zju.edu.cn/include/auth_action.php";
             HttpWebResponse response = null;
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebRequest request = null;
+            Stream myRequestStream = null;
+            request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = "POST";
+            request.KeepAlive = false;
             request.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; Tridene/7.0; rv:11.0) like Gecko";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = Encoding.UTF8.GetByteCount(data);
             request.Host = "net.zju.edu.cn";
 
-            var data_byte = Encoding.Default.GetBytes(data);
-
-            Stream myRequestStream = request.GetRequestStream();
-            int i = 0;
-            do
+            for (int i = 0; i < 15; i++)
             {
-                StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
-                myStreamWriter.Write(data);
-                myStreamWriter.Close();
-                Thread.Sleep(10);
-                response = (HttpWebResponse)request.GetResponse();
-            } while ((response == null || response.StatusCode != HttpStatusCode.OK) && i++ < 10);
+                try
+                {
+                    myRequestStream = request.GetRequestStream();
+                    var myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
+                    myStreamWriter.Write(data);
+                    myStreamWriter.Close();
+                    Thread.Sleep(80);
+                    response = (HttpWebResponse)request.GetResponse();
+                    if (response == null || response.StatusCode != HttpStatusCode.OK)
+                        continue;
+                    else break;
+                }
+                catch
+                {
+                    Thread.Sleep(80);
+                    continue;
+                }
+            }
+            myRequestStream.Close();
         }
 
         public string GetCurrentConnection(string WlanToBeChecked)//负责获取当前连接的WIFI的名字，并建立WIFISSID类的对象
@@ -144,17 +154,19 @@ namespace ZJUWLAN_Connection
                 {
                     IsZJUWlanDetected = true;
                     var currentNetwork = networks.FirstOrDefault(n => n.profileName == WlanToBeChecked); //这一句写的太蠢了，有空一定要改
+                    WIFISSID.WlanSsid.wlanInterface = wlanIface;
                     WIFISSID.WlanSsid.wlanSignalQuality = (int)currentNetwork.wlanSignalQuality;
                     WIFISSID.WlanSsid.SSID = GetStringForSSID(currentNetwork.dot11Ssid);
                     WIFISSID.WlanSsid.dot11DefaultAuthAlgorithm = currentNetwork.dot11DefaultAuthAlgorithm.ToString();
-                    WIFISSID.WlanSsid.wlanInterface = wlanIface;
                 }
 
                 if (wlanIface.InterfaceState == Wlan.WlanInterfaceState.Connected && wlanIface.CurrentConnection.isState == Wlan.WlanInterfaceState.Connected)
                 {
+                    GC.Collect();  //强制垃圾回收，把用完的client变量收回去，不然连续多次会报错
                     return wlanIface.CurrentConnection.profileName;
                 }
             }
+            GC.Collect();  //强制垃圾回收，把用完的client变量收回去，不然连续多次会报错
             return string.Empty;
         }
 

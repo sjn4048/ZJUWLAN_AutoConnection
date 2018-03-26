@@ -1,6 +1,14 @@
 # ZJUWLAN_AutoConnection
 A toy-program written in C# to connect ZJUWLAN
 
+# 18/03/26更新日志：(Version 1.2.1)
+上次更新完之后就没有ZJUWLAN环境了，导致之后在家里做的乱更新差点把程序搞崩了...这次修正了几个问题
+1.修复了开机自动启动在某些机器下存在的bug
+2.修复了连续检查网络(10次以上)会导致程序错误的bug
+3.修复了由于ZJUWLAN系统偶尔抽风导致的无法连接到远程地址的bug
+4.修复了连接时偶尔出现的“值不能为null”bug
+5.大幅降低了“Post失败需要重试”的出现概率
+
 # 18/01/27更新日志：(Version 1.2)
 呼...终于考完试了，本次的主要更新内容：
 

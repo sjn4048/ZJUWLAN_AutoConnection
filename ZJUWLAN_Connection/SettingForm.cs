@@ -19,6 +19,7 @@ namespace ZJUWLAN_Connection
 
         private void SettingForm_Load(object sender, EventArgs e)
         {
+            textBox2.PasswordChar = '*';
             ShowConfig();
         }
 

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Net.NetworkInformation;
@@ -16,6 +17,8 @@ namespace ZJUWLAN_Connection
 {
     public partial class MainForm : Form
     {
+        NetworkMonitor networkMonitor;
+
         WIFIRequest wifiRequest = new WIFIRequest();
         string wifiSSID = "ZJUWLAN";
         int pingTime, signalQuality;
@@ -26,12 +29,13 @@ namespace ZJUWLAN_Connection
             InitializeComponent();
             SystemEvents.PowerModeChanged += OnPowerChange; //如果从睡眠中恢复，则自动连接
             NetworkChange.NetworkAvailabilityChanged += new NetworkAvailabilityChangedEventHandler(NetworkChangedCallback); //如果ip地址改变
-
+            timerCounter.Interval = 1000;
+            timerCounter.Start();
         }
 
         private void NetworkChangedCallback(object sender, EventArgs e) //改变ip或网络条件后的行为
         {
-            
+
             ConnectWifi(showFailReason: false);//后台自动连接时，不弹出失败原因，失败就失败了吧
         }
 
@@ -65,7 +69,7 @@ namespace ZJUWLAN_Connection
                     {
                         TopMost = true
                     }.ShowDialog();
-                    
+
                 }
                 DisplayResult(wifiRequest);
                 if (Config.isAutoConnection)
@@ -91,7 +95,18 @@ namespace ZJUWLAN_Connection
                 ConnectWifi();
             });
         }
-        
+
+        private void TestSpeed()
+        {
+            networkMonitor = new NetworkMonitor();
+            if (networkMonitor.Adapters.Length == 0)
+            {
+                throw new Exception("No network adapters found on this computer.");
+            }
+            //networkMonitor.StopMonitoring();
+            networkMonitor.StartMonitoring();
+        }
+
         private void DisplayResult(WIFIRequest wifiRequest)
         {
             wifiRequest.CheckWifiState(out signalQuality, out pingTime, wifiSSID);
@@ -117,7 +132,7 @@ namespace ZJUWLAN_Connection
             switch (wifiRequest.IsNetAvailable)
             {
                 case (true):
-                    this.checkLabel.Text = $"已联网, ping:{pingTime}ms, 信号:{WIFISSID.WlanSsid.wlanSignalQuality}";
+                    this.checkLabel.Text = $"ping: {pingTime}ms, 信号: {WIFISSID.WlanSsid.wlanSignalQuality}";
                     this.checkLabel.ForeColor = Color.DarkGreen;
                     break;
                 case (false):
@@ -168,15 +183,8 @@ namespace ZJUWLAN_Connection
                         this.ShowInTaskbar = false;
                         this.NotifyIcon.ShowBalloonTip(2000, "连接成功", "已经帮主人连好Wifi啦~", ToolTipIcon.Info);
                     }
+                    TestSpeed();
                     DisplayResult(wifiRequest);
-                    /* 自动脚本区域，暂时删掉放到linux上了
-                    Process autoProcess = new Process();
-                    autoProcess.StartInfo.CreateNoWindow = true;
-                    autoProcess.StartInfo.UseShellExecute = false;
-                    autoProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    autoProcess.StartInfo.FileName = "";
-                    autoProcess.Start();//可改成执行任务部分
-                    */
                     return;
                 }
 
@@ -200,7 +208,9 @@ namespace ZJUWLAN_Connection
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message + " ## " + ex.TargetSite + " ## " + ex.StackTrace);
+                FileStream fs = new FileStream("error.log", FileMode.Append);
+                StreamWriter sw = new StreamWriter(fs);
+                sw.WriteLine("-------\n" + ex.Message + "\n" + ex.TargetSite + "\n" + ex.StackTrace + "\n" + DateTime.Now.ToShortTimeString() + "\n-------\n\n");
             }
         }
 
@@ -251,6 +261,37 @@ namespace ZJUWLAN_Connection
         {
             new SettingForm() { TopMost = true }
             .ShowDialog();
+        }
+
+        private void 打开日志ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!File.Exists("error.log"))
+                File.Create("error.log").Close();
+            Process.Start("error.log");
+        }
+
+        private void timerCounter_Tick(object sender, EventArgs e)
+        {
+            if (networkMonitor == null || networkMonitor.Adapters.Length == 0)
+            {
+                speedLabel.Text = "当前速度(Kbps): 未联网";
+                speedLabel.ForeColor = Color.DarkRed;
+            }
+            else
+            {
+                speedLabel.Text = "当前速度(Kbps): " + networkMonitor.Adapters.Sum(x => x.DownloadSpeedKbps).ToString("0.0") + " / " + networkMonitor.Adapters.Sum(x => x.UploadSpeedKbps).ToString("0.0");
+                speedLabel.ForeColor = Color.DarkGreen;
+            }
+            DisplayResult(wifiRequest);
+        }
+
+        private void testSpeedButton_Click(object sender, EventArgs e)
+        {
+            Task.Factory.StartNew(() => // 将阻塞线程的操作在另外一个线程中执行，这样就不会堵塞UI线程。     
+            {
+                double result = wifiRequest.TestMaxSpeed(); //运行时间5s左右  
+                MessageBox.Show("Speed: " + result.ToString("0.0") + "kb/s");
+            });
         }
 
         protected override void WndProc(ref Message msg) //右上角关闭窗体后，不自动关闭程序

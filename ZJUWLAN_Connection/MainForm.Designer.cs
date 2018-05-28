@@ -44,7 +44,13 @@
             this.设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.打开日志ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.timerCounter = new System.Windows.Forms.Timer(this.components);
+            this.speedLabel = new System.Windows.Forms.Label();
+            this.testSpeedButton = new System.Windows.Forms.Button();
             this.ContextMenu_NotifyIcon.SuspendLayout();
+            this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // connectLabel
@@ -71,9 +77,9 @@
             // ConnectButton
             // 
             this.ConnectButton.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.ConnectButton.Location = new System.Drawing.Point(146, 145);
+            this.ConnectButton.Location = new System.Drawing.Point(126, 189);
             this.ConnectButton.Name = "ConnectButton";
-            this.ConnectButton.Size = new System.Drawing.Size(105, 40);
+            this.ConnectButton.Size = new System.Drawing.Size(87, 40);
             this.ConnectButton.TabIndex = 2;
             this.ConnectButton.Text = "一键连接";
             this.ConnectButton.UseVisualStyleBackColor = true;
@@ -82,9 +88,9 @@
             // CheckButton
             // 
             this.CheckButton.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.CheckButton.Location = new System.Drawing.Point(34, 145);
+            this.CheckButton.Location = new System.Drawing.Point(31, 189);
             this.CheckButton.Name = "CheckButton";
-            this.CheckButton.Size = new System.Drawing.Size(105, 40);
+            this.CheckButton.Size = new System.Drawing.Size(89, 40);
             this.CheckButton.TabIndex = 2;
             this.CheckButton.Text = "检查网络";
             this.CheckButton.UseVisualStyleBackColor = true;
@@ -103,9 +109,9 @@
             // SettingButton
             // 
             this.SettingButton.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.SettingButton.Location = new System.Drawing.Point(258, 145);
+            this.SettingButton.Location = new System.Drawing.Point(219, 189);
             this.SettingButton.Name = "SettingButton";
-            this.SettingButton.Size = new System.Drawing.Size(80, 40);
+            this.SettingButton.Size = new System.Drawing.Size(68, 40);
             this.SettingButton.TabIndex = 2;
             this.SettingButton.Text = "设置";
             this.SettingButton.UseVisualStyleBackColor = true;
@@ -170,14 +176,58 @@
             this.退出ToolStripMenuItem.Text = "退出(&X)";
             this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
             // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.打开日志ToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(165, 28);
+            // 
+            // 打开日志ToolStripMenuItem
+            // 
+            this.打开日志ToolStripMenuItem.Name = "打开日志ToolStripMenuItem";
+            this.打开日志ToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
+            this.打开日志ToolStripMenuItem.Size = new System.Drawing.Size(164, 24);
+            this.打开日志ToolStripMenuItem.Text = "打开日志";
+            this.打开日志ToolStripMenuItem.Click += new System.EventHandler(this.打开日志ToolStripMenuItem_Click);
+            // 
+            // timerCounter
+            // 
+            this.timerCounter.Tick += new System.EventHandler(this.timerCounter_Tick);
+            // 
+            // speedLabel
+            // 
+            this.speedLabel.AutoSize = true;
+            this.speedLabel.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.speedLabel.Location = new System.Drawing.Point(41, 140);
+            this.speedLabel.Name = "speedLabel";
+            this.speedLabel.Size = new System.Drawing.Size(92, 27);
+            this.speedLabel.TabIndex = 1;
+            this.speedLabel.Text = "当前网速";
+            // 
+            // testSpeedButton
+            // 
+            this.testSpeedButton.Font = new System.Drawing.Font("微软雅黑", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.testSpeedButton.Location = new System.Drawing.Point(293, 189);
+            this.testSpeedButton.Name = "testSpeedButton";
+            this.testSpeedButton.Size = new System.Drawing.Size(68, 40);
+            this.testSpeedButton.TabIndex = 2;
+            this.testSpeedButton.Text = "测速";
+            this.testSpeedButton.UseVisualStyleBackColor = true;
+            this.testSpeedButton.Click += new System.EventHandler(this.testSpeedButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(378, 201);
+            this.ClientSize = new System.Drawing.Size(390, 244);
+            this.ContextMenuStrip = this.contextMenuStrip1;
+            this.Controls.Add(this.testSpeedButton);
             this.Controls.Add(this.SettingButton);
             this.Controls.Add(this.CheckButton);
             this.Controls.Add(this.ConnectButton);
+            this.Controls.Add(this.speedLabel);
             this.Controls.Add(this.checkLabel);
             this.Controls.Add(this.findLabel);
             this.Controls.Add(this.connectLabel);
@@ -191,6 +241,7 @@
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.SizeChanged += new System.EventHandler(this.MainForm_SizeChanged);
             this.ContextMenu_NotifyIcon.ResumeLayout(false);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -212,6 +263,11 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem 设置ToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem 打开日志ToolStripMenuItem;
+        private System.Windows.Forms.Timer timerCounter;
+        public System.Windows.Forms.Label speedLabel;
+        private System.Windows.Forms.Button testSpeedButton;
     }
 }
 

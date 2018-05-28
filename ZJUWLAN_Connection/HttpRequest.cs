@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 using NativeWifi;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ZJUWLAN_Connection
 {
@@ -72,7 +71,7 @@ namespace ZJUWLAN_Connection
             ConnectionResult connectionResult = ConnectionResult.Success;
 
             CheckWifiState(out signalQuality, out pingTime);
-
+            //Thread.Sleep(50);
             if (IsNetAvailable && !Config.isZJUWLANFirst) //若已连接到别的Wifi且设置中不优先连接ZJUWLAN
                 return ConnectionResult.AlreadyConnected;
             else if (IsNetAvailable && Config.isZJUWLANFirst) //若设置中要求一定要连接ZJUWLAN
@@ -82,13 +81,18 @@ namespace ZJUWLAN_Connection
                 return ConnectionResult.Unfound;
 
             if (WlanStatus != WlanStatusEnum.ZJUWlan) //如果未连接ZJUWLAN，先连接上
+            {
                 ConnectWifi(wifiSSID);
-
+                //Thread.Sleep(100);
+            }
+            //Thread.Sleep(10);
             CheckWifiState(out signalQuality, out pingTime); //有可能连接上之后沿用了之前的连接模式，直接就可以使用了
             if (IsNetAvailable)
                 return ConnectionResult.Success;
 
+            //Thread.Sleep(30);
             PostZJUWLAN(Config.username, Config.password); //发送请求 different #2
+            //Thread.Sleep(30);
 
             CheckWifiState(out signalQuality, out pingTime); //检查当前网络状态，返回对应的状态
             if (IsNetAvailable)
@@ -129,7 +133,7 @@ namespace ZJUWLAN_Connection
                     var myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
                     myStreamWriter.Write(data);
                     myStreamWriter.Close();
-                    Thread.Sleep(80);
+                    //Thread.Sleep(10);
                     response = (HttpWebResponse)request.GetResponse();
                     if (response == null || response.StatusCode != HttpStatusCode.OK)
                         continue;
@@ -137,11 +141,11 @@ namespace ZJUWLAN_Connection
                 }
                 catch
                 {
-                    Thread.Sleep(80);
+                    //Thread.Sleep(10);
                     continue;
                 }
             }
-            myRequestStream.Close();
+            myRequestStream?.Close();
         }
 
         public string GetCurrentConnection(string WlanToBeChecked)//负责获取当前连接的WIFI的名字，并建立WIFISSID类的对象
@@ -191,6 +195,19 @@ namespace ZJUWLAN_Connection
             return 0;
         }
 
+        public double TestMaxSpeed()
+        {
+            double result = -1.0;
+
+            string url = "http://speedtest.wdc01.softlayer.com/downloads/test10.zip";
+            WebClient myWebClient = new WebClient();
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            myWebClient.DownloadFile(url, "temp.zip");
+            result = 10.0 * 1000 * 1000 / (stopwatch.ElapsedMilliseconds);
+            File.Delete("temp.zip");
+            return result;
+        }
     }
 
     class WIFISSID
